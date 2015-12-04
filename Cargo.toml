@@ -1,0 +1,5 @@
+[package]
+
+name = "ssm"
+version = "0.1.0"
+authors = ["Adam Kalman <dkeka.zkfaks+github@gmail.com>"]
