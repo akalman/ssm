@@ -3,3 +3,10 @@
 name = "ssm"
 version = "0.1.0"
 authors = ["Adam Kalman <dkeka.zkfaks+github@gmail.com>"]
+
+
+[dependencies]
+
+docopt = "0.6"
+rustc-serialize = "0.3"
+
