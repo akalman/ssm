@@ -6,6 +6,9 @@ use std::io;
 use std::fs::{self, DirEntry};
 use std::path::Path;
 
+mod simfile;
+mod simfile_parser;
+
 const USAGE: &'static str =
 "
 Stepmania Song Manager
@@ -30,32 +33,44 @@ struct Args {
 
 fn main() {
     let args: Args = Docopt::new(USAGE)
-                            .and_then(|d| d.decode())
-                            .unwrap_or_else(|e| e.exit());
+        .and_then(|d| d.decode())
+        .unwrap_or_else(|e| e.exit());
 
     let result = parse_songs_folder();
     match result.err() {
         Some(x) => println!("{:?}", x),
-	None => println!("done"),
+        None => println!("done"),
     }
 }
 
 fn parse_songs_folder() -> io::Result<()> {
     let path = Path::new("./Songs");
+    let groups = try!(fs::read_dir(path));
 
-    for group in try!(fs::read_dir(path)) {
-        try!(parse_group_folder(try!(group)));
+    for group_listing in groups {
+        let group = try!(group_listing);
+
+        try!(parse_group_folder(group));
     }
 
-    Ok(())
+    return Ok(());
 }
 
 fn parse_group_folder(group: DirEntry) -> io::Result<()> {
-    for song in try!(fs::read_dir(group.path())) {
-        parse_song_folder(try!(song));
+    let group_metadata = try!(group.metadata());
+    if !group_metadata.is_dir() {
+        return Ok(());
     }
 
-    Ok(())
+    let songs = try!(fs::read_dir(group.path()));
+
+    for song_listing in songs {
+        let song = try!(song_listing);
+
+        parse_song_folder(song);
+    }
+
+    return Ok(());
 }
 
 fn parse_song_folder(song: DirEntry) {
